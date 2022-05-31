@@ -1,6 +1,12 @@
 from scraper.TwitterScraper import TwitterScraper
-topics = ["Fabia", "Enyaq", "SuperB"]
+from configparser import ConfigParser
 
-for topic in topics:
-    TwitterScraper.scrape(TwitterScraper, topic)
-    print(TwitterScraper.getData(TwitterScraper))
+parser = ConfigParser()
+parser.read('config.ini')
+
+for topic in parser.get('scraper_settings', 'keywords').strip().split(','):
+    for language in parser.get('scraper_settings', 'languages').strip().split(','):
+        scraper = TwitterScraper()
+        scraper.scrape(topic, language)
+        tweets = scraper.getData()
+        print(tweets)
