@@ -4,9 +4,10 @@ from configparser import ConfigParser
 parser = ConfigParser()
 parser.read('config.ini')
 
-for topic in parser.get('scraper_settings', 'keywords').strip().split(','):
-    for language in parser.get('scraper_settings', 'languages').strip().split(','):
+for topic in parser.get('scraper_settings', 'keywords').split(','):
+    #for language in parser.get('scraper_settings', 'languages').split(','):
+        language = 'en'
         scraper = TwitterScraper()
-        scraper.scrape(topic, language)
+        scraper.scrape(topic.strip(), language)
         tweets = scraper.getData()
         print(tweets)
