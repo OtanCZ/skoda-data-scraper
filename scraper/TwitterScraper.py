@@ -1,7 +1,12 @@
 from interface import implements
 from scraper.iscraper import iScraper
 from configparser import ConfigParser
+from datetime import date
+from os.path import exists
+from collections import Counter
+from langdetect import detect
 import twint
+import csv
 
 parser = ConfigParser()
 parser.read('config.ini')
@@ -10,7 +15,6 @@ class TwitterScraper(implements(iScraper)):
     tweets = None
 
     def scrape(self, topic, language):
-        print("Scraping Twitter Data For Keyword " + topic + " in " + language)
         c = twint.Config()
         c.Lang = language
         c.Store_csv = True
@@ -48,5 +52,10 @@ class TwitterScraper(implements(iScraper)):
             print(langs)
 
     def getData(self):
-        return self.tweets
+        if not self.tweets == None:
+            return self.tweets
+        else:
+            return "No Tweets Found"
 
+    def printToCSV(self):
+        pass
