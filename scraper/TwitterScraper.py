@@ -24,18 +24,17 @@ class TwitterScraper(implements(iScraper)):
             c.Search = ["Škoda", topic]
         else:
             c.Search = [topic]
-        if exists("./tweets-" + topic + "-" + str(date.today()) + ".csv"):
+        if exists(path+"tweets-" + topic + "-" + str(date.today()) + ".csv"):
             return print("Tweets for " + topic + "was already scraped for today.")
         else:
             print("Scraping Twitter Data For Keyword " + topic + "...")
             self.tweets = twint.run.Search(c)
 
-            file = open("./tweets-" + topic + "-" + str(date.today()) + ".csv")
+            file = open(path+"tweets-" + topic + "-" + str(date.today()) + ".csv")
             csvReader = csv.reader(file)
             header = next(csvReader)
             header.append("lang")
             rows = []
-            langs = dict()
             for row in csvReader:
                 rows.append(row)
                 row.append(detect(row[0]))
