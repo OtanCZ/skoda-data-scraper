@@ -11,3 +11,4 @@ for topic in parser.get('scraper_settings', 'keywords').split(','):
         scraper.scrape(topic.strip(), language)
         tweets = scraper.getData()
         ##print(tweets)
+scraper.printTweetWordsToCSV()
