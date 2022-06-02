@@ -13,24 +13,25 @@ parser.read('config.ini')
 path = parser.get('output_settings', 'outputPath')
 class TwitterScraper(implements(iScraper)):
     tweets = None
+    usedDates = []
 
     def scrape(self, topic, language):
         c = twint.Config()
         c.Lang = language
         c.Store_csv = True
         c.Custom["tweet"] = ["tweet", "date", "username", "hashtags", "link"]
-        c.Output = path+"tweets-" + topic + "-" + str(date.today()) + ".csv"
+        c.Output = path + "tweets-" + topic + ".csv"
         if parser.get('scraper_settings', 'strictMode').lower() == 'true':
             c.Search = ["Škoda", topic]
         else:
             c.Search = [topic]
-        if exists(path+"tweets-" + topic + "-" + str(date.today()) + ".csv"):
+        if exists(path + "tweets-" + topic + ".csv"):
             return print("Tweets for " + topic + "was already scraped for today.")
         else:
             print("Scraping Twitter Data For Keyword " + topic + "...")
             self.tweets = twint.run.Search(c)
 
-            file = open(path+"tweets-" + topic + "-" + str(date.today()) + ".csv")
+            file = open(path + "tweets-" + topic + ".csv")
             csvReader = csv.reader(file)
             header = next(csvReader)
             header.append("lang")
@@ -49,25 +50,40 @@ class TwitterScraper(implements(iScraper)):
             return "No Tweets Found"
 
     def printTweetWordsToCSV(self):
-        langs = dict()
-        for topic in parser.get('scraper_settings', 'keywords').split(','):
-            file = open(path + "tweets-" + topic.strip() + "-" + str(date.today()) + ".csv")
-            csvReader = csv.reader(file)
-            header = next(csvReader)
-            rows = []
-            for row in csvReader:
-                rows.append(row)
-                if not row[len(row) - 1] in langs:
-                    print("Adding language " + row[len(row) - 1] + " to langs dictionary...")
-                    langs[row[len(row) - 1]] = Counter()
+        with open(path + 'tweet--words.csv', 'w', encoding='UTF8') as mfile:
+            writer = csv.writer(mfile)
+            writer.writerow(["date", "lang", "keyword", "word", "count"])
 
-                for word in row[0].split():
-                    langs[row[len(row) - 1]][word] += 1
-            file.close()
-        with open(path + 'tweet-'+ str(date.today()) + '-words.csv', 'w', encoding='UTF8') as file:
-            writer = csv.writer(file)
-            writer.writerow(["lang", "word", "count"])
-            for lang in langs:
-                for word in langs[lang].most_common(int(parser.get('output_settings', 'topWords'))):
-                    writer.writerow([lang, word[0], word[1]])
-        print(langs)
+            for topic in parser.get('scraper_settings', 'keywords').split(','):
+                file = open(path + 'tweets-' + topic.strip() + '.csv')
+                self.usedDates = []
+                csvReader = csv.reader(file)
+                header = next(csvReader)
+                allrows = []
+                sortedrows = []
+                print(topic)
+                langdates = dict()
+                for row in csvReader:
+                    allrows.append(row)
+
+                for sortedrow in allrows:
+                    if not self.isInUsedDates(sortedrow[1]):
+                        temp_row = []
+                        for row1 in allrows:
+                            if sortedrow[1] == row1[1]:
+                                temp_row.append(row1)
+                        for row5 in temp_row:
+                            for word in row5[0].split():
+                                if not row5[len(row5) - 1] in langdates:
+                                    print("Adding language " + row5[len(row5) - 1] + " to langs dictionary...")
+                                    langdates[row5[len(row5) - 1]] = Counter()
+                                else:
+                                    langdates[row5[len(row5) - 1]][word] += 1
+
+                        for lang in langdates:
+                            for word in langdates[lang].most_common(int(parser.get('output_settings', 'topWords'))):
+                                sortedrows.append([temp_row[0][1], lang, topic ,word[0], word[1]])
+                    else:
+                        continue
+
+                writer.writerows(sortedrows)
