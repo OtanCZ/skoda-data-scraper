@@ -39,7 +39,7 @@ class TwitterScraper(implements(iScraper)):
             for row in csvReader:
                 rows.append(row)
                 row.append(detect(row[0]))
-            with open(path + "tweets-" + topic + "-" + str(date.today()) + ".csv", 'w', encoding='UTF8') as file:
+            with open(path + "tweets-" + topic + ".csv", 'w', encoding='UTF8') as file:
                 writer = csv.writer(file)
                 writer.writerow(header)
                 writer.writerows(rows)
@@ -48,6 +48,13 @@ class TwitterScraper(implements(iScraper)):
             return self.tweets
         else:
             return "No Tweets Found"
+
+    def isInUsedDates(self, date):
+        if not date in self.usedDates:
+            self.usedDates.append(date)
+            return False
+        else:
+            return True
 
     def printTweetWordsToCSV(self):
         with open(path + 'tweet--words.csv', 'w', encoding='UTF8') as mfile:

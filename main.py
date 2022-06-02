@@ -10,5 +10,5 @@ for topic in parser.get('scraper_settings', 'keywords').split(','):
         scraper = TwitterScraper()
         scraper.scrape(topic.strip(), language)
         tweets = scraper.getData()
-        ##print(tweets)
+        print(tweets)
 scraper.printTweetWordsToCSV()
