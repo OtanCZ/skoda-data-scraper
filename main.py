@@ -5,10 +5,13 @@ parser = ConfigParser()
 parser.read('config.ini')
 
 for topic in parser.get('scraper_settings', 'keywords').split(','):
-    #for language in parser.get('scraper_settings', 'languages').split(','):
-        language = 'en'
         scraper = TwitterScraper()
-        scraper.scrape(topic.strip(), language)
+        scraper.scrape(topic.strip())
         tweets = scraper.getData()
         print(tweets)
-scraper.printTweetWordsToCSV()
+
+if parser.get('output_settings', 'enableWordsOutput').lower() == "true":
+        scraper.printTweetWordsToCSV()
+
+if parser.get('output_settings', 'enableCountOutput').lower() == "true":
+        scraper.printTweetCountsToCSV()
