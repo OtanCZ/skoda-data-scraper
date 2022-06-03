@@ -80,6 +80,19 @@ class TwitterScraper(implements(iScraper)):
             for count in tweetCount:
                 writer.writerow([count.split(".")[1], count.split(".")[2], count.split(".")[0], tweetCount[count]])
 
+    def printAllCSVIntoOne(self):
+        with open(path + 'tweets.csv', 'w', encoding='UTF8') as mfile:
+            writer = csv.writer(mfile)
+            writer.writerow(["tweet", "date", "username", "hashtags", "link", "lang", "keyword"])
+
+            for topic in parser.get('scraper_settings', 'keywords').split(','):
+                file = open(path + 'tweets-' + topic.strip() + '.csv')
+                csvReader = csv.reader(file)
+                header = next(csvReader)
+                for row in csvReader:
+                    row.append(topic)
+                    writer.writerow(row)
+
     def printTweetWordsToCSV(self):
         with open(path + 'tweet-words.csv', 'w', encoding='UTF8') as mfile:
             writer = csv.writer(mfile)

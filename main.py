@@ -15,3 +15,6 @@ if parser.get('output_settings', 'enableWordsOutput').lower() == "true":
 
 if parser.get('output_settings', 'enableCountOutput').lower() == "true":
         scraper.printTweetCountsToCSV()
+
+if parser.get('output_settings', 'enableTweetsInOneCSV').lower() == "true":
+        scraper.printAllCSVIntoOne()
